@@ -1,12 +1,38 @@
 import requests
 import datetime as dt
 import os
+from newsapi import NewsApiClient
 
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
-
 ALPHA_API = os.environ.get('ALPHA_API')
 NEWS_API = os.environ.get('NEWS_API')
+
+#NEWS
+
+newsapi = NewsApiClient(api_key=NEWS_API)
+
+#/v2/top-headlines
+top_headlines = newsapi.get_top_headlines(q=COMPANY_NAME,
+                                          sources='bbc-news,the-verge, cnn, financial-post, fox-news,google-news,crypto-coins-news, business-insider, cbs-news, fortune, hacker-news, msnbc, nbc-news, politicio, reddit-r-all, reuters, techcrunch, the-huffington-post, the-next-web,the-verge, the-wall-street-journal, time,wired',
+                                          language='en',)
+
+sources = newsapi.get_sources()
+number_of_articles = len(top_headlines['articles'])
+
+print(top_headlines)
+articles = top_headlines['articles']
+
+print("Articles")
+print(articles)
+
+for source in articles[:3]:
+    print(source['source']['name'])
+    print(source['author'])
+    print(source['title'])
+    print(source['content'])
+
+#STOCK
 
 params = {
     'function':'TIME_SERIES_DAILY',
@@ -18,6 +44,7 @@ response = requests.get('https://www.alphavantage.co/query',params=params)
 response.raise_for_status()
 
 stock_data = response.json()
+print(stock_data)
 time_series_daily = stock_data['Time Series (Daily)']
 
 now = dt.datetime.now()
@@ -63,11 +90,8 @@ else:
 ## STEP 2: Use https://newsapi.org
 # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME. 
 
-## STEP 3: Use https://www.twilio.com
-# Send a seperate message with the percentage change and each article's title and description to your phone number. 
 
-
-#Optional: Format the SMS message like this: 
+#Optional: Format the message like this:
 """
 TSLA: 🔺2%
 Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
