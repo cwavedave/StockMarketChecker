@@ -18,10 +18,7 @@ response = requests.get('https://www.alphavantage.co/query',params=params)
 response.raise_for_status()
 
 stock_data = response.json()
-print(stock_data)
-
 time_series_daily = stock_data['Time Series (Daily)']
-print(time_series_daily)
 
 now = dt.datetime.now()
 yesterday = now - dt.timedelta(1)
@@ -32,8 +29,33 @@ now_str = now.strftime('%Y-%m-%d')
 if now_str in time_series_daily:
     print("Today has started")
 else:
-    print(time_series_daily[yesterday_str])
+    open = float(time_series_daily[yesterday_str]['1. open'])
+    close = float(time_series_daily[yesterday_str]['4. close'])
 
+    print("Yesterday Open")
+    print(time_series_daily[yesterday_str]['1. open'])
+
+    print("Yesterday Close")
+    print(time_series_daily[yesterday_str]['4. close'])
+
+    print("Diff")
+    if close > open:
+        increase = close - open
+        diff = round((increase / open) * 100,2)
+        if diff > 5:
+            print(f"Stock UP by {diff}%")
+            print("Get News")
+
+    elif open > close:
+        decrease = open - close
+        diff = (decrease / open) * 100
+        diff = round(diff * -1,2)
+        if diff < -5:
+            print(f"stock DOWN by {diff}%")
+            print("Get News")
+    else:
+        diff = 0
+    print(f"{diff}%")
 
 ## STEP 1: Use https://www.alphavantage.co
 # When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
