@@ -50,6 +50,8 @@ yesterday_str = yesterday.strftime('%Y-%m-%d')
 now_str = now.strftime('%Y-%m-%d')
 
 if now_str in time_series_daily:
+    #TODO this part needs work.
+
     print("Today has started")
     print(news_today[0])
 else:
@@ -66,8 +68,7 @@ else:
     if close > open:
         increase = close - open
         diff = round((increase / open) * 100,2)
-        if diff > 5:
-            print(f"Stock UP by {diff}%")
+        if diff > 0.3:
             print(f"{STOCK}: ⬆️️ {diff}%")
             print(f"Headline:{news_today[0]['title']}")
             print(f"Brief:{news_today[0]['content']}")
@@ -76,8 +77,7 @@ else:
         decrease = open - close
         diff = (decrease / open) * 100
         diff = round(diff * -1,2)
-        if diff < -5:
-            print(f"stock DOWN by {diff}%")
+        if diff < -0.3:
             print(f"{STOCK}: ⬇️ {diff}%")
             print(f"Headline:{news_today[0]['title']}")
             print(f"Brief:{news_today[0]['content']}")
