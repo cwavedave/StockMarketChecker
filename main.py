@@ -9,7 +9,6 @@ ALPHA_API = os.environ.get('ALPHA_API')
 NEWS_API = os.environ.get('NEWS_API')
 
 #NEWS
-
 newsapi = NewsApiClient(api_key=NEWS_API)
 
 #/v2/top-headlines
@@ -20,17 +19,15 @@ top_headlines = newsapi.get_top_headlines(q=COMPANY_NAME,
 sources = newsapi.get_sources()
 number_of_articles = len(top_headlines['articles'])
 
-print(top_headlines)
 articles = top_headlines['articles']
 
-print("Articles")
-print(articles)
+news_today = []
 
 for source in articles[:3]:
-    print(source['source']['name'])
-    print(source['author'])
-    print(source['title'])
-    print(source['content'])
+    news_today.append({'name':source['source']['name'],
+                       'author':source['author'],
+                       'title': source['title'],
+                        'content':source['content']})
 
 #STOCK
 
@@ -44,7 +41,6 @@ response = requests.get('https://www.alphavantage.co/query',params=params)
 response.raise_for_status()
 
 stock_data = response.json()
-print(stock_data)
 time_series_daily = stock_data['Time Series (Daily)']
 
 now = dt.datetime.now()
@@ -55,6 +51,7 @@ now_str = now.strftime('%Y-%m-%d')
 
 if now_str in time_series_daily:
     print("Today has started")
+    print(news_today[0])
 else:
     open = float(time_series_daily[yesterday_str]['1. open'])
     close = float(time_series_daily[yesterday_str]['4. close'])
@@ -71,7 +68,9 @@ else:
         diff = round((increase / open) * 100,2)
         if diff > 5:
             print(f"Stock UP by {diff}%")
-            print("Get News")
+            print(f"{STOCK}: ⬆️️ {diff}%")
+            print(f"Headline:{news_today[0]['title']}")
+            print(f"Brief:{news_today[0]['content']}")
 
     elif open > close:
         decrease = open - close
@@ -79,26 +78,11 @@ else:
         diff = round(diff * -1,2)
         if diff < -5:
             print(f"stock DOWN by {diff}%")
-            print("Get News")
+            print(f"{STOCK}: ⬇️ {diff}%")
+            print(f"Headline:{news_today[0]['title']}")
+            print(f"Brief:{news_today[0]['content']}")
+
     else:
         diff = 0
-    print(f"{diff}%")
-
-## STEP 1: Use https://www.alphavantage.co
-# When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
-
-## STEP 2: Use https://newsapi.org
-# Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME. 
-
-
-#Optional: Format the message like this:
-"""
-TSLA: 🔺2%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-or
-"TSLA: 🔻5%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-"""
-
+        print(f"{diff}%")
+        print("No Change")
